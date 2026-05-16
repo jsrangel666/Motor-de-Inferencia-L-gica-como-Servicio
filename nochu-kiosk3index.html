@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nochu Toast & Coffee — Kiosco</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#F47B20;--or-lt:#FFA44F;--or-dk:#C4601A;--or-pale:#FFF0E0;
+  --bone:#F9F3E8;--bone-dk:#EDE0C8;--bone-dkr:#D5C4A0;
+  --dark:#1C1007;--dark-lt:#6B4C3B;--dark-md:#3E2010;
+  --green:#2C4A3E;--cream:#FDF8EE;--white:#fff;--sh:rgba(28,16,7,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+/* ─ GRAIN TEXTURE ─────────────────────────────── */
+body{font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--dark);min-height:100vh;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(244,123,32,.055) 1px,transparent 1px);background-size:22px 22px;pointer-events:none;z-index:0}
+
+/* ─ HEADER ─────────────────────────────────────── */
+.hdr{background:var(--dark);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 3px 24px rgba(0,0,0,.5);border-bottom:2px solid rgba(244,123,32,.25)}
+.logo{display:flex;align-items:center;gap:14px}
+.logo-mark{width:44px;height:44px;background:var(--or);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;box-shadow:0 0 0 3px rgba(244,123,32,.3),0 0 0 6px rgba(244,123,32,.1);flex-shrink:0}
+.logo-txt b{font-size:23px;letter-spacing:5px;font-weight:700;color:var(--or-lt);font-family:'Playfair Display',serif;display:block;line-height:1}
+.logo-txt small{font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.35);font-weight:300;text-transform:uppercase}
+.hdr-deco{display:flex;gap:16px;align-items:center;opacity:.18;font-size:13px;letter-spacing:1px;color:var(--or-lt)}
+.hdr-r{display:flex;align-items:center;gap:14px}
+.dbadge{background:var(--or);color:#fff;font-size:9px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;display:none;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.clock b{display:block;font-size:18px;font-weight:500;color:var(--or-lt);text-align:right;font-family:'DM Mono',monospace}
+.clock span{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px}
+
+/* ─ LAYOUT ─────────────────────────────────────── */
+.main{display:grid;grid-template-columns:1fr 322px;min-height:calc(100vh - 66px);position:relative;z-index:1}
+
+/* ─ MENU SECTION ──────────────────────────────── */
+.menu-sec{padding:0;overflow-y:auto;max-height:calc(100vh - 66px)}
+.menu-inner{padding:0 18px 22px}
+
+/* ─ TOAST HERO ─────────────────────────────────── */
+.toast-hero{position:relative;margin-bottom:0;overflow:hidden}
+.toast-hero svg{display:block;width:100%}
+.hero-tagline{text-align:center;background:var(--or);padding:7px 18px;display:flex;align-items:center;justify-content:center;gap:18px;font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.9)}
+.hero-tagline span{opacity:.4}
+
+/* ─ TABS ───────────────────────────────────────── */
+.tabs-wrap{padding:16px 18px 12px;background:var(--cream);border-bottom:1px solid var(--bone-dk);position:sticky;top:66px;z-index:50;box-shadow:0 2px 8px rgba(28,16,7,.06)}
+.tabs{display:flex;gap:6px;white-space:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 18px;border:1.5px solid var(--dark-md);background:transparent;color:var(--dark-md);font-size:10.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:30px;transition:all .18s;flex-shrink:0;font-family:'DM Sans',sans-serif}
+.tab:hover{background:var(--dark-md);color:var(--bone)}
+.tab.active{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 3px 10px rgba(244,123,32,.35)}
+
+/* ─ SECTION HEADER ─────────────────────────────── */
+.sec-hdr{font-family:'Playfair Display',serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--dark-lt);margin:20px 0 11px;display:flex;align-items:center;gap:10px;font-style:italic}
+.sec-hdr::before{content:'✦';font-style:normal;font-size:9px;color:var(--or)}
+.sec-hdr::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--or-dk),transparent);opacity:.3}
+.sec-hdr.gr::before{color:var(--green)} .sec-hdr.gr::after{background:linear-gradient(90deg,var(--green),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px;margin-bottom:6px}
+
+/* ─ CARD ───────────────────────────────────────── */
+.card{background:var(--cream);border-radius:12px;overflow:hidden;box-shadow:0 4px 16px var(--sh),0 0 0 1px rgba(244,123,32,.08);cursor:pointer;transition:all .24s cubic-bezier(.34,1.56,.64,1);border:1.5px solid rgba(244,123,32,.1);position:relative}
+.card::after{content:'';position:absolute;inset:0;border-radius:12px;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent 50%);pointer-events:none}
+.card:hover{transform:translateY(-6px) scale(1.015);box-shadow:0 18px 38px rgba(28,16,7,.18),0 0 0 2px var(--or);border-color:var(--or)}
+.card-img{width:100%;height:120px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;font-size:50px}
+.card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:0}
+.card-img.toast{background:linear-gradient(145deg,#2A1205,#5C3015)}
+.card-img.power{background:linear-gradient(145deg,#0F2018,#2C4A3E)}
+.card-img.cafe{background:linear-gradient(145deg,#180A02,#3d2010)}
+.card-img.fresh{background:linear-gradient(145deg,#0A1F1A,#1a3830)}
+.card-img.skinny{background:linear-gradient(145deg,#12182A,#1e2a45)}
+/* Illustrated corner accent */
+.card-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(transparent,rgba(0,0,0,.22));pointer-events:none}
+.b-rec{position:absolute;top:8px;right:8px;background:var(--or);color:#fff;font-size:8px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;z-index:2;box-shadow:0 2px 8px rgba(244,123,32,.4)}
+.b-pow{background:var(--green)!important}
+.b-sz{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);color:rgba(255,255,255,.9);font-size:7.5px;font-weight:600;padding:2px 8px;border-radius:10px;z-index:2;font-family:'DM Mono',monospace}
+.card-body{padding:11px 13px 13px;border-top:1px solid rgba(244,123,32,.08)}
+.card-name{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:600;margin-bottom:4px;line-height:1.25;color:var(--dark)}
+.card-ing{font-size:10px;color:var(--dark-lt);line-height:1.55;margin-bottom:8px;opacity:.75}
+.card-foot{display:flex;align-items:center;justify-content:space-between}
+.card-price{font-size:17px;font-weight:700;color:var(--dark);font-family:'Playfair Display',serif}
+.card-price em{font-size:9px;font-weight:300;font-style:normal;color:var(--dark-lt);font-family:'DM Sans',sans-serif}
+.card-price small{display:block;font-size:8px;color:var(--dark-lt);line-height:1.2;font-family:'DM Sans',sans-serif;font-weight:400}
+.card-btn{width:28px;height:28px;border-radius:50%;background:var(--or);color:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .17s;flex-shrink:0;box-shadow:0 3px 10px rgba(244,123,32,.3)}
+.card-btn:hover{background:var(--or-dk);transform:scale(1.1)}
+
+/* ─ TICKET PANEL ────────────────────────────────── */
+.ticket-panel{background:var(--dark);display:flex;flex-direction:column;position:sticky;top:66px;height:calc(100vh - 66px);border-left:1px solid rgba(244,123,32,.15)}
+/* Perforated top decoration on ticket panel */
+.ticket-panel::before{content:'· · · · · · · · · · · · · · · ·';display:block;padding:5px 12px;font-size:9px;letter-spacing:3px;color:rgba(244,123,32,.25);background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.05);font-family:'DM Mono',monospace}
+.tk-hdr{padding:12px 16px 10px;border-bottom:1px dashed rgba(255,255,255,.08)}
+.tk-logo{font-family:'Playfair Display',serif;font-size:10px;font-weight:700;color:var(--or);letter-spacing:4px;text-transform:uppercase}
+.tk-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--bone-dk);font-style:italic}
+.tk-items{flex:1;overflow-y:auto;padding:8px 13px}
+.tk-items::-webkit-scrollbar{width:2px} .tk-items::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.tk-empty{text-align:center;padding:28px 12px;color:rgba(255,255,255,.2);font-size:11px;line-height:2.2;font-family:'Playfair Display',serif;font-style:italic}
+.tk-empty span{display:block;font-size:26px;margin-bottom:8px;opacity:.25}
+.tk-item{border-bottom:1px dashed rgba(255,255,255,.06);padding:8px 0;animation:slIn .25s ease}
+@keyframes slIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.tk-row{display:flex;justify-content:space-between;align-items:flex-start}
+.tk-name{font-family:'Playfair Display',serif;font-size:12px;color:var(--bone-dk);font-weight:600;flex:1;line-height:1.3}
+.tk-sz{font-size:7.5px;color:var(--or-lt);background:rgba(244,123,32,.15);padding:1px 5px;border-radius:8px;margin-left:4px;font-family:'DM Mono',monospace}
+.tk-p{font-size:12.5px;font-weight:500;color:var(--or-lt);margin-left:7px;flex-shrink:0;font-family:'DM Mono',monospace}
+.tk-rm-btn{background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;font-size:11px;padding:0 0 0 5px;transition:color .17s}
+.tk-rm-btn:hover{color:#EF9A9A}
+.tk-d{font-size:9px;color:rgba(255,255,255,.28);line-height:1.7;font-family:'DM Mono',monospace}
+.tk-d.rm{text-decoration:line-through;opacity:.18}
+.tk-d.add{color:var(--or-lt);opacity:.55}
+.cortesia{background:rgba(244,123,32,.09);border:1px dashed rgba(244,123,32,.3);border-radius:6px;padding:8px 10px;margin:6px 0;display:flex;align-items:center;gap:7px;animation:slIn .35s ease}
+.cortesia-txt{font-size:10px;color:var(--or-lt);line-height:1.5}
+.tk-foot{padding:10px 13px;background:rgba(0,0,0,.25);border-top:1px dashed rgba(255,255,255,.06)}
+.tk-total{display:flex;justify-content:space-between;align-items:center;padding:6px 0 0}
+.tk-total-lbl{font-family:'Playfair Display',serif;font-size:15px;color:var(--bone-dk);font-style:italic}
+.tk-total-num{font-size:22px;font-weight:700;color:var(--or-lt);font-family:'DM Mono',monospace}
+.btn-ord{width:100%;padding:13px;background:var(--or);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:10px;transition:all .2s;box-shadow:0 4px 16px rgba(244,123,32,.35)}
+.btn-ord:hover{background:var(--or-dk);transform:translateY(-1px)} .btn-ord:disabled{opacity:.28;cursor:not-allowed;box-shadow:none;transform:none}
+
+/* ─ PRODUCT MODAL ───────────────────────────────── */
+.ov{position:fixed;inset:0;background:rgba(28,16,7,.8);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:14px}
+.ov.open{display:flex}
+.modal{background:var(--cream);border-radius:16px;max-width:450px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 28px 70px rgba(0,0,0,.55),0 0 0 1px rgba(244,123,32,.15);animation:mIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mIn{from{opacity:0;transform:scale(.86) translateY(16px)}to{opacity:1;transform:none}}
+.m-hdr{padding:16px 20px;border-radius:16px 16px 0 0;position:sticky;top:0;z-index:5}
+.m-hdr.toast{background:linear-gradient(145deg,var(--dark),#2A1205)}
+.m-hdr.power{background:linear-gradient(145deg,var(--green),#0F2018)}
+.m-hdr.cafe,.m-hdr.skinny{background:linear-gradient(145deg,#180A02,var(--dark))}
+.m-hdr.fresh{background:linear-gradient(145deg,#0A1F1A,#12252a)}
+.m-top{display:flex;justify-content:space-between;align-items:flex-start}
+.m-title{font-family:'Playfair Display',serif;font-size:21px;color:#fff;font-style:italic;margin-bottom:2px}
+.m-sub{font-size:8.5px;color:rgba(255,255,255,.38);letter-spacing:2.5px;text-transform:uppercase;font-family:'DM Mono',monospace}
+.m-price-big{font-size:24px;font-weight:700;color:var(--or-lt);font-family:'DM Mono',monospace}
+.m-x{background:none;border:none;color:rgba(255,255,255,.28);font-size:20px;cursor:pointer;transition:color .17s;margin-top:2px}
+.m-x:hover{color:#fff}
+.m-body{padding:14px 20px}
+.m-sec{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--dark-lt);margin:13px 0 7px;display:flex;align-items:center;gap:8px}
+.m-sec::after{content:'';flex:1;height:1px;background:var(--or);opacity:.15}
+.sz-btns{display:flex;gap:7px;margin-bottom:2px}
+.sz-btn{flex:1;padding:10px 6px;border:1.5px solid var(--bone-dkr);background:var(--white);border-radius:9px;cursor:pointer;text-align:center;transition:all .17s;font-family:'DM Sans',sans-serif}
+.sz-btn:hover{border-color:var(--or-lt)} .sz-btn.sel{border-color:var(--or);background:rgba(244,123,32,.06)}
+.sz-lbl{font-size:12px;font-weight:700;color:var(--dark);display:block} .sz-btn.sel .sz-lbl{color:var(--or-dk)}
+.sz-p{font-size:11px;color:var(--dark-lt);display:block;font-family:'DM Mono',monospace}
+.ing-row,.mod-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--white);border-radius:8px;border:1.5px solid transparent;cursor:pointer;transition:all .17s;box-shadow:0 2px 8px var(--sh);margin-bottom:5px}
+.ing-row:hover,.mod-row:hover{border-color:var(--bone-dkr)}
+.ing-row.rm{opacity:.38;background:var(--bone-dk)}
+.ing-row.rm .ing-n{text-decoration:line-through;color:var(--dark-lt)}
+.mod-row.sel{border-color:var(--or);background:rgba(244,123,32,.05)}
+.ing-n{font-size:12.5px;display:flex;align-items:center;gap:7px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.mod-n{font-size:12.5px;color:var(--dark)} .mod-p{font-size:10.5px;color:var(--dark-lt);font-family:'DM Mono',monospace}
+.chk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--bone-dkr);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .17s;flex-shrink:0}
+.mod-row.sel .chk{border-color:var(--or);background:var(--or);color:#fff}
+.sug{background:rgba(44,74,62,.06);border:1px solid rgba(44,74,62,.16);border-radius:9px;padding:11px 12px;display:flex;align-items:center;gap:9px;margin-top:4px}
+.sug-txt{font-size:11px;color:var(--dark);line-height:1.5;flex:1}
+.sug-btn{padding:7px 12px;background:var(--or);color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .17s}
+.sug-btn:hover{background:var(--or-dk)}
+.m-foot{padding:11px 20px 15px;border-top:1px solid var(--bone-dk);display:flex;justify-content:space-between;align-items:center;position:sticky;bottom:0;background:var(--cream)}
+.m-tot{font-family:'Playfair Display',serif;font-size:16px;color:var(--dark)}
+.m-tot b{font-size:20px}
+.btn-add{padding:11px 18px;background:var(--or);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(244,123,32,.3)}
+.btn-add:hover{background:var(--or-dk)}
+
+/* ════════════════════════════════════════════
+   TICKET VINTAGE — Boleto artesanal Nochu
+   ════════════════════════════════════════════ */
+.tk-ov{position:fixed;inset:0;background:rgba(28,16,7,.93);backdrop-filter:blur(12px);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.tk-ov.open{display:flex}
+.tk-paper{background:#FDF8F0;max-width:380px;width:100%;border-radius:6px;box-shadow:0 32px 90px rgba(0,0,0,.65),0 0 0 1px rgba(244,123,32,.18);overflow:hidden;animation:tkIn .4s cubic-bezier(.34,1.56,.64,1);position:relative;font-family:'DM Mono',monospace}
+@keyframes tkIn{from{opacity:0;transform:scale(.88) translateY(22px)}to{opacity:1;transform:none}}
+.perf-top,.perf-bot{height:18px;background:var(--dark);overflow:hidden;position:relative}
+.perf-top::before,.perf-bot::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 14px,#FDF8F0 14px,#FDF8F0 28px);mask:radial-gradient(circle 7px at 50% 0%,transparent 6px,black 7px) repeat-x;-webkit-mask:radial-gradient(circle 7px at 50% 0%,transparent 6px,black 7px) repeat-x}
+.perf-bot::before{mask:radial-gradient(circle 7px at 50% 100%,transparent 6px,black 7px) repeat-x;-webkit-mask:radial-gradient(circle 7px at 50% 100%,transparent 6px,black 7px) repeat-x}
+.tk-stub-line{position:absolute;left:52px;top:18px;bottom:18px;width:1px;background:repeating-linear-gradient(180deg,var(--or) 0,var(--or) 5px,transparent 5px,transparent 9px);z-index:3}
+.tk-stub{position:absolute;left:0;top:18px;bottom:18px;width:52px;display:flex;align-items:center;justify-content:center;z-index:2}
+.tk-stub-txt{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:8.5px;font-weight:500;letter-spacing:3px;color:var(--or-dk);text-transform:uppercase}
+.tk-content{margin-left:52px;padding:18px 16px}
+.tk-brand{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--or)}
+.tk-brand-name{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--dark);letter-spacing:7px;line-height:1}
+.tk-brand-sub{font-size:8px;letter-spacing:4px;color:var(--or-dk);margin-top:3px;text-transform:uppercase}
+.tk-brand-city{font-size:7.5px;letter-spacing:2px;color:rgba(28,16,7,.35);margin-top:2px}
+.tk-meta{display:flex;justify-content:space-between;font-size:8px;color:rgba(28,16,7,.4);margin-bottom:12px;letter-spacing:.5px}
+.tk-meta strong{color:var(--or-dk)}
+.tk-div{border:none;border-top:1px dashed rgba(28,16,7,.15);margin:10px 0}
+.tk-dots{text-align:center;font-size:9px;color:rgba(28,16,7,.18);letter-spacing:5px;margin:8px 0}
+.tki{margin-bottom:9px}
+.tki-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.tki-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--dark);flex:1;line-height:1.3}
+.tki-sz{font-size:8px;color:var(--or-dk);font-family:'DM Mono',monospace;font-weight:500}
+.tki-dots-fill{flex:1;border-bottom:1px dotted rgba(28,16,7,.18);margin:0 4px 3px}
+.tki-price{font-size:13px;font-weight:500;color:var(--dark);white-space:nowrap;font-family:'DM Mono',monospace}
+.tki-detail{font-size:9px;color:rgba(28,16,7,.35);line-height:1.9;margin-top:2px;padding-left:2px;letter-spacing:.3px}
+.tki-detail .sin{text-decoration:line-through;color:rgba(28,16,7,.2)}
+.tki-detail .ex{color:var(--or-dk)}
+.tk-totals{margin-top:6px}
+.tk-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;padding-top:8px;border-top:2.5px solid var(--dark)}
+.tk-total-lbl{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--dark)}
+.tk-total-val{font-size:22px;font-weight:700;color:var(--dark);font-family:'DM Mono',monospace}
+.tk-cortesia{display:flex;align-items:center;gap:8px;background:rgba(244,123,32,.07);border:1px dashed var(--or);border-radius:5px;padding:7px 10px;margin:9px 0;font-size:9.5px;color:var(--or-dk)}
+/* QR section — apunta a link de puntos */
+.tk-qr-sec{text-align:center;padding:14px 0 4px}
+.tk-qr-lbl{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(28,16,7,.32);margin-bottom:8px}
+.tk-qr-box{display:inline-block;background:#fff;padding:10px;border-radius:8px;box-shadow:0 2px 14px rgba(28,16,7,.1);border:1px solid rgba(28,16,7,.06)}
+.tk-qr-hint{font-size:8px;letter-spacing:1.5px;color:rgba(28,16,7,.28);margin-top:7px;text-transform:uppercase}
+.tk-cashback{display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--or-dk);font-weight:500;margin:8px 0;background:rgba(244,123,32,.05);padding:8px;border-radius:5px;border:1px dashed rgba(244,123,32,.2)}
+.tk-footer{text-align:center;padding:10px 0 4px;font-size:7.5px;letter-spacing:2px;color:rgba(28,16,7,.28);text-transform:uppercase;line-height:2.2}
+.tk-btns{display:flex;gap:8px;padding:12px 16px 14px;background:#FDF8F0;border-top:1px solid rgba(28,16,7,.07)}
+.tk-btn-new{flex:1;padding:11px;background:var(--dark);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.tk-btn-new:hover{background:var(--or)}
+.tk-btn-print{padding:11px 14px;background:rgba(244,123,32,.09);color:var(--or-dk);border:1.5px solid rgba(244,123,32,.35);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.tk-btn-print:hover{background:var(--or);color:#fff}
+
+/* ─ TOAST NOTIF ─────────────────────────────────── */
+.tc{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.tn{background:var(--dark);color:var(--bone-dk);padding:10px 17px;border-radius:9px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 7px 22px rgba(0,0,0,.38);animation:tIn .25s ease,tOut .25s ease 3.7s forwards;border-left:3px solid var(--or)}
+@keyframes tIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0}}
+
+@media print{.tk-ov{display:flex!important;position:relative;background:none;backdrop-filter:none;z-index:auto}.hdr,.main,.tc,.tk-btns{display:none!important}.tk-paper{box-shadow:none;max-width:100%;animation:none}}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════ -->
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <div class="logo-txt">
+      <b>NOCHU</b>
+      <small>Toast &amp; Coffee · Mérida, Yucatán</small>
+    </div>
+  </div>
+  <div class="hdr-deco">✦ &nbsp; ☕ &nbsp; ✦ &nbsp; 🍞 &nbsp; ✦</div>
+  <div class="hdr-r">
+    <div id="dbadge" class="dbadge">🌅 Desayuno Nochu</div>
+    <div class="clock"><b id="clock">--:--</b><span>MXN</span></div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ══ MENU ══════════════════════════════════════════════ -->
+  <section class="menu-sec">
+
+    <!-- TOAST HERO -->
+    <div class="toast-hero">
+      <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <!-- Fondo warm -->
+        <rect width="640" height="230" fill="#F5E8CC"/>
+        <!-- Grano / textura -->
+        <rect width="640" height="230" fill="url(#grain)" opacity=".18"/>
+        <defs>
+          <pattern id="grain" patternUnits="userSpaceOnUse" width="40" height="40">
+            <circle cx="10" cy="10" r="1" fill="#C47830" opacity=".3"/>
+            <circle cx="30" cy="25" r=".7" fill="#C47830" opacity=".2"/>
+            <circle cx="5" cy="32" r=".9" fill="#C47830" opacity=".25"/>
+          </pattern>
+          <filter id="shadow"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="rgba(28,16,7,.28)"/></filter>
+        </defs>
+        <!-- Toast slice shape - shadow -->
+        <path d="M80,88 C80,28 560,28 560,88 L560,210 Q560,222 548,222 L92,222 Q80,222 80,210 Z" fill="rgba(28,16,7,.12)" filter="url(#shadow)" transform="translate(3,6)"/>
+        <!-- Toast body -->
+        <path d="M80,86 C80,26 560,26 560,86 L560,208 Q560,220 548,220 L92,220 Q80,220 80,208 Z" fill="#FDF0C8"/>
+        <!-- Crust golden -->
+        <path d="M80,86 C80,26 560,26 560,86 L545,86 C545,44 95,44 95,86 Z" fill="#C47830"/>
+        <!-- Crust highlight -->
+        <path d="M80,86 C80,26 560,26 560,86 L555,78 C548,34 90,34 86,78 Z" fill="rgba(255,255,255,.15)"/>
+        <!-- Crust shine dots -->
+        <circle cx="200" cy="62" r="3" fill="rgba(255,255,255,.25)"/>
+        <circle cx="340" cy="55" r="2.5" fill="rgba(255,255,255,.2)"/>
+        <circle cx="460" cy="60" r="3.5" fill="rgba(255,255,255,.2)"/>
+        <!-- Inner toast crumb tone -->
+        <path d="M100,100 L540,100 L540,215 L100,215 Z" fill="#F9E8A0" opacity=".22"/>
+        <!-- Perforations left -->
+        <circle cx="95" cy="148" r="10" fill="#F5E8CC"/>
+        <circle cx="95" cy="172" r="10" fill="#F5E8CC"/>
+        <!-- Perforations right -->
+        <circle cx="545" cy="148" r="10" fill="#F5E8CC"/>
+        <circle cx="545" cy="172" r="10" fill="#F5E8CC"/>
+        <!-- Stub line left -->
+        <line x1="118" y1="95" x2="118" y2="218" stroke="#F47B20" stroke-width="1.2" stroke-dasharray="5,5" opacity=".5"/>
+        <!-- NOCHU brand inside -->
+        <text x="340" y="155" text-anchor="middle" font-family="'Playfair Display', serif" font-size="58" font-weight="700" fill="#2A1008" letter-spacing="16" opacity=".92">NOCHU</text>
+        <text x="340" y="178" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10" fill="#8B5220" letter-spacing="5">TOAST &amp; COFFEE · MÉRIDA, YUCATÁN</text>
+        <!-- Stars decorativas -->
+        <text x="238" y="160" font-size="14" fill="#F47B20" opacity=".7">✦</text>
+        <text x="436" y="160" font-size="14" fill="#F47B20" opacity=".7">✦</text>
+        <!-- Illustrated accents -->
+        <text x="135" y="200" font-size="22" opacity=".28">☕</text>
+        <text x="492" y="200" font-size="22" opacity=".28">🍞</text>
+        <!-- Corner number marks (like ticket) -->
+        <text x="86" y="105" font-family="'DM Mono',monospace" font-size="9" fill="#C47830" opacity=".5">1</text>
+        <text x="86" y="218" font-family="'DM Mono',monospace" font-size="9" fill="#C47830" opacity=".5">2</text>
+        <text x="547" y="105" font-family="'DM Mono',monospace" font-size="9" fill="#C47830" opacity=".5">1</text>
+        <text x="547" y="218" font-family="'DM Mono',monospace" font-size="9" fill="#C47830" opacity=".5">2</text>
+      </svg>
+    </div>
+    <div class="hero-tagline">
+      <span>✦</span> Pan Brioche Artesanal <span>·</span> Café de Especialidad <span>·</span> Buenas Vibras <span>✦</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrap">
+      <div class="tabs" id="tabs"></div>
+    </div>
+
+    <!-- MENU GRID -->
+    <div class="menu-inner" id="menu-ctn"></div>
+  </section>
+
+  <!-- ══ TICKET PANEL ══════════════════════════════════════ -->
+  <aside class="ticket-panel">
+    <div class="tk-hdr">
+      <div class="tk-logo">✦ Nochu ✦</div>
+      <div class="tk-title">Tu Comanda</div>
+    </div>
+    <div class="tk-items" id="tk-items">
+      <div class="tk-empty"><span>🧡</span>Selecciona un producto<br>para empezar<br>tu orden</div>
+    </div>
+    <div class="tk-foot">
+      <div class="tk-total">
+        <span class="tk-total-lbl">Total</span>
+        <span class="tk-total-num" id="tk-total">$0</span>
+      </div>
+      <button class="btn-ord" id="btn-ord" onclick="procesarOrden()" disabled>Procesar Orden →</button>
+    </div>
+  </aside>
+</main>
+
+<!-- ══ PRODUCT MODAL ════════════════════════════════════════ -->
+<div class="ov" id="ov" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="m-hdr" id="m-hdr">
+      <div class="m-top">
+        <div><div class="m-title" id="m-title">—</div><div class="m-sub" id="m-sub">—</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <div class="m-price-big" id="m-price">$0</div>
+          <button class="m-x" onclick="closeModal()">✕</button>
+        </div>
+      </div>
+    </div>
+    <div class="m-body" id="m-body"></div>
+    <div class="m-foot">
+      <div class="m-tot">Total: <b id="m-tot-val">$0</b></div>
+      <button class="btn-add" onclick="addToOrder()">Agregar <span>→</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TICKET VINTAGE OVERLAY ════════════════════════════════ -->
+<div class="tk-ov" id="tk-ov">
+  <div class="tk-paper">
+    <div class="perf-top"></div>
+    <div class="tk-stub-line"></div>
+    <div class="tk-stub"><div class="tk-stub-txt">Nochu · Mérida</div></div>
+    <div class="tk-content">
+      <div class="tk-brand">
+        <div class="tk-brand-name">NOCHU</div>
+        <div class="tk-brand-sub">Toast &amp; Coffee</div>
+        <div class="tk-brand-city">✦ Mérida, Yucatán ✦</div>
+      </div>
+      <div class="tk-meta">
+        <span>ORDEN: <strong id="t-hash">—</strong></span>
+        <span id="t-hora">—</span>
+      </div>
+      <hr class="tk-div">
+      <div id="t-items"></div>
+      <hr class="tk-div">
+      <div class="tk-totals">
+        <div id="t-cortesia" style="display:none">
+          <div class="tk-cortesia"><span>🍪</span><div><strong>Cortesía Nochu</strong> — Galleta Artesanal<br><span style="font-size:8px;opacity:.7">Regalo de la casa por tu orden</span></div></div>
+        </div>
+        <div class="tk-total-row">
+          <span class="tk-total-lbl">Total</span>
+          <span class="tk-total-val" id="t-total">$0</span>
+        </div>
+      </div>
+      <div class="tk-dots">· · · · · · · · · · · · · · ·</div>
+      <!-- QR apunta al link de puntos Nochu -->
+      <div class="tk-qr-sec">
+        <div class="tk-qr-lbl">Escanea · Acumula Puntos Nochu</div>
+        <div class="tk-qr-box">
+          <img id="t-qr" src="" alt="QR Puntos Nochu" width="160" height="160" style="display:block;border-radius:3px">
+        </div>
+        <div class="tk-qr-hint">Valida tu pago y gana recompensas</div>
+      </div>
+      <div class="tk-dots">· · · · · · · · · · · · · · ·</div>
+      <div class="tk-cashback">⭐ <span>¡Acumulas <strong>puntos Nochu</strong>! Presenta en ventanilla.</span></div>
+      <div class="tk-footer">Gracias por tu visita<br>nochu.mx · @nochutoast<br>✦ &nbsp; Good Taste &nbsp; ✦</div>
+    </div>
+    <div class="perf-bot"></div>
+    <div class="tk-btns">
+      <button class="tk-btn-print" onclick="window.print()">🖨 Imprimir</button>
+      <button class="tk-btn-new" onclick="newOrder()">Nueva Orden →</button>
+    </div>
+  </div>
+</div>
+
+<div class="tc" id="tc"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// 📸 AGREGAR FOTOS: sube a imgbb.com → copia "Direct link"
+//    → pégalo en el campo  img:''  del producto
+// ════════════════════════════════════════════════════════════
+const KB=[
+  {id:'egg_toast',  cat:'toast',sec:'Clásicos',  name:'Egg Toast',    price:129,emoji:'🍳',img:'',
+   ing:['Pan brioche artesanal','Huevo','Doble queso cheddar'],type:'savory'},
+  {id:'avo',        cat:'toast',sec:'Clásicos',  name:'Avo',          price:159,emoji:'🥑',img:'',
+   ing:['Pan brioche artesanal','Huevo','Guacamole','Queso cheddar','Aguacate'],type:'savory'},
+  {id:'americano_t',cat:'toast',sec:'Clásicos',  name:'Americano',    price:149,emoji:'🥚',img:'',
+   ing:['Pan brioche artesanal','Huevo','Jamón','Queso cheddar','Tocino'],type:'savory'},
+  {id:'bacon_jam',  cat:'toast',sec:'Clásicos',  name:'Bacon Jam',    price:159,emoji:'🥓',img:'',
+   ing:['Pan brioche artesanal','Huevo','Jamón','Queso cheddar','Mermelada de tocino'],type:'savory'},
+  {id:'beef',       cat:'toast',sec:'Especiales',name:'Beef ⭐',       price:169,emoji:'🥩',rec:true,img:'',
+   ing:['Pan brioche artesanal','Carne de res dulce 160g','Queso cheddar','Huevo estrellado yema tierna'],type:'savory'},
+  {id:'ryoko',      cat:'toast',sec:'Especiales',name:'Ryoko Toast',  price:169,emoji:'🍱',img:'',
+   ing:['Pan brioche artesanal','Lomo de cerdo tonkatsu','Kimchi','Soya picante'],type:'savory'},
+  {id:'nochilaquil',cat:'toast',sec:'Especiales',name:'Nochilaquil',  price:179,emoji:'🫔',img:'',
+   ing:['Pan brioche artesanal','Chilaquiles en salsa roja','Pollo','Crema','Queso'],type:'savory'},
+  {id:'pastrami',   cat:'toast',sec:'Especiales',name:'Pastrami',     price:199,emoji:'🧀',img:'',
+   ing:['Salsa tomate con pimientos','Mostaza de la casa','Queso holandés','Manzana en conserva','Pastrami'],type:'savory'},
+  {id:'marquesita', cat:'toast',sec:'Dulce',     name:'Marquesita',   price:139,emoji:'🍫',img:'',
+   ing:['Pan brioche artesanal','Nutella','Queso de bola'],type:'sweet'},
+  {id:'fresh_eggy', cat:'power',sec:'Power Lab', name:'Fresh Eggy',   price:139,emoji:'💪',rec:true,img:'',
+   ing:['3 claras de huevo','Espinacas ponchadas','Jamón de pavo','Queso oaxaca','Aderezo aguacate-cilantro'],type:'savory'},
+  {id:'fresh_chick',cat:'power',sec:'Power Lab', name:'Fresh Chick',  price:159,emoji:'🐔',rec:true,img:'',
+   ing:['Aderezo chipotle griego','Espinaca','Queso oaxaca','Pollo a la plancha 120g','Pico de gallo verde','Cacahuate','Alfalfa'],type:'savory'},
+  {id:'caramel_l',  cat:'cafe',sec:'Top Nochu ⭐',name:'Caramel Latte',  priceM:83,priceG:99,priceH:79, emoji:'🍮',img:'',rec:true,hasSz:true,hasH:true},
+  {id:'horchata_l', cat:'cafe',sec:'Top Nochu ⭐',name:'Horchata Latte', priceM:83,priceG:99,            emoji:'🍚',img:'',rec:true,hasSz:true},
+  {id:'chai_l',     cat:'cafe',sec:'Top Nochu ⭐',name:'Chai Latte',     priceM:89,priceG:105,priceH:79, emoji:'🫖',img:'',rec:true,hasSz:true,hasH:true},
+  {id:'americano_c',cat:'cafe',sec:'Coffee Morning',name:'Café Americano',price:49,                     emoji:'☕',img:''},
+  {id:'latte_c',    cat:'cafe',sec:'Coffee Morning',name:'Latte',         priceM:79,priceG:89,priceH:75, emoji:'🥛',img:'',hasSz:true,hasH:true},
+  {id:'capuchino',  cat:'cafe',sec:'Coffee Morning',name:'Capuchino',     price:75,                      emoji:'☕',img:''},
+  {id:'vainilla_l', cat:'cafe',sec:'Coffee Morning',name:'Vainilla Latte',priceM:83,priceG:99,priceH:79, emoji:'🍦',img:'',hasSz:true,hasH:true},
+  {id:'dirty_chai', cat:'cafe',sec:'Coffee Morning',name:'Dirty Chai',    priceM:99,priceG:115,priceH:89,emoji:'🌿',img:'',hasSz:true,hasH:true},
+  {id:'moka',       cat:'cafe',sec:'Coffee Morning',name:'Moka',          priceM:83,priceG:99,priceH:79, emoji:'🍫',img:'',hasSz:true,hasH:true},
+  {id:'limonada',   cat:'fresh',sec:'Refrescantes',name:'Limonada Natural',priceM:59,priceG:69,emoji:'🍋',img:'',hasSz:true},
+  {id:'berry_f',    cat:'fresh',sec:'Refrescantes',name:'Berry Fresh',     priceM:62,priceG:89,emoji:'🍓',img:'',hasSz:true},
+  {id:'honey_l',    cat:'fresh',sec:'Refrescantes',name:'Honey Lemonade',  priceM:65,priceG:89,emoji:'🍯',img:'',hasSz:true},
+  {id:'maracu_f',   cat:'fresh',sec:'Refrescantes',name:'Maracu Fresh',    priceM:69,priceG:89,emoji:'🍹',img:'',hasSz:true},
+  {id:'taro',       cat:'fresh',sec:'Otras',       name:'Taro Milk Tea',   priceM:69,priceG:82,emoji:'🧋',img:'',hasSz:true},
+  {id:'choco',      cat:'fresh',sec:'Otras',       name:'Choco',           priceM:72,priceG:82,priceH:69,emoji:'🍫',img:'',hasSz:true,hasH:true},
+  {id:'sk_chai',    cat:'skinny',sec:'Skinny Mixes',name:'Skinny Chai',    price:89,emoji:'🌿',img:'',badge:'Low Cal'},
+  {id:'sk_caramel', cat:'skinny',sec:'Skinny Mixes',name:'Caramel Skinny', price:84,emoji:'🍮',img:'',badge:'0 kcal'},
+  {id:'sk_vainilla',cat:'skinny',sec:'Skinny Mixes',name:'Vainilla Skinny',price:84,emoji:'🍦',img:'',badge:'0 kcal'},
+];
+
+const EXTRAS=[{id:'x_huevo',name:'Omelette / Huevo',price:20},{id:'x_aguacate',name:'Aguacate',price:20},{id:'x_guaca',name:'Guacamole',price:20},{id:'x_tocino',name:'Tocino',price:20},{id:'x_jamon',name:'Jamón',price:20},{id:'x_merme',name:'Mermelada de Tocino',price:20}];
+const ADEREZOS=[{id:'a_cil',name:'Cilantro',price:15},{id:'a_ranch',name:'Ranch',price:15},{id:'a_hab',name:'Habanero',price:15},{id:'a_buf',name:'Búfalo',price:15},{id:'a_macha',name:'Macha',price:15}];
+const PAPAS=[{id:'p_g',name:'Papas Grandes',price:59},{id:'p_m',name:'Papas Medianas',price:29}];
+const CAFE_EX=[{id:'cx_shot',name:'Extra Shot',price:25},{id:'cx_alm',name:'Leche de Almendra',price:20},{id:'cx_avena',name:'Leche de Avena',price:20}];
+const ALL_MODS=[...EXTRAS,...ADEREZOS,...PAPAS,...CAFE_EX];
+
+const es_horario_desayuno=()=>{const h=new Date().getHours();return h>=8&&h<11};
+const sugerencia_barista=it=>{if(['sweet','savory_sweet'].includes(it.type))return KB.find(x=>x.id==='americano_c');return null;};
+const calcular_total=items=>{const total=items.reduce((a,it)=>a+it._price+(it.mods||[]).reduce((b,m)=>b+m.price,0),0);return{total,cortesia:total>300};};
+
+let orden=[],curItem=null,curSz='M',curRm=new Set(),curMods=new Set(),activeCat='all';
+
+const CATS=[{id:'all',lbl:'✦ Todo'},{id:'toast',lbl:'Toasts'},{id:'power',lbl:'Power Lab'},{id:'cafe',lbl:'Café'},{id:'fresh',lbl:'Bebidas Frías'},{id:'skinny',lbl:'Skinny Mixes'}];
+function renderTabs(){document.getElementById('tabs').innerHTML=CATS.map(c=>`<button class="tab${activeCat===c.id?' active':''}" onclick="setCat('${c.id}')">${c.lbl}</button>`).join('');}
+function setCat(c){activeCat=c;renderTabs();renderMenu();}
+
+function renderMenu(){
+  const items=activeCat==='all'?KB:KB.filter(i=>i.cat===activeCat);
+  const secs={};items.forEach(it=>{(secs[it.sec]||(secs[it.sec]=[])).push(it);});
+  document.getElementById('menu-ctn').innerHTML=Object.entries(secs).map(([sec,its])=>
+    `<div class="sec-hdr${sec.includes('Power')?' gr':''}">${sec}</div><div class="grid">${its.map(cardHTML).join('')}</div>`
+  ).join('');
+}
+function baseP(it){return it.hasSz?it.priceM:(it.price||0);}
+function cardHTML(it){
+  const p=baseP(it);
+  return`<div class="card" onclick="openModal('${it.id}')">
+    <div class="card-img ${it.cat}">
+      ${it.img?`<img src="${it.img}" alt="${it.name}" onerror="this.style.display='none'">`:''}
+      <span style="position:relative;z-index:1${it.img?';display:none':''}">${it.emoji}</span>
+      ${it.rec?`<span class="b-rec${it.cat==='power'?' b-pow':''}">⭐ ${it.cat==='power'?'Power':'Top'}</span>`:''}
+      ${it.badge?`<span class="b-rec b-pow">${it.badge}</span>`:''}
+      ${it.hasSz?`<span class="b-sz">M · G${it.hasH?' · Hot':''}</span>`:''}
+    </div>
+    <div class="card-body">
+      <div class="card-name">${it.name}</div>
+      ${it.ing?`<div class="card-ing">${it.ing.slice(0,2).join(' · ')}</div>`:''}
+      <div class="card-foot">
+        <div class="card-price">$${p}<em> MXN</em>${it.hasSz?`<small>desde $${p}</small>`:''}</div>
+        <button class="card-btn" onclick="event.stopPropagation();openModal('${it.id}')">+</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openModal(id){
+  curItem=KB.find(i=>i.id===id);curSz='M';curRm=new Set();curMods=new Set();
+  document.getElementById('m-hdr').className='m-hdr '+curItem.cat;
+  document.getElementById('m-title').textContent=curItem.name;
+  document.getElementById('m-sub').textContent={toast:'TOAST · NOCHU',power:'POWER LAB',cafe:'CAFÉ · NOCHU',fresh:'BEBIDA FRÍA',skinny:'SKINNY MIX'}[curItem.cat];
+  renderMBody();document.getElementById('ov').classList.add('open');
+}
+function curP(){if(curItem.hasSz){if(curSz==='G')return curItem.priceG;if(curSz==='H')return curItem.priceH||curItem.priceM;return curItem.priceM;}return curItem.price||curItem.priceM||0;}
+function renderMBody(){
+  const it=curItem;let h='';
+  document.getElementById('m-price').textContent='$'+curP();
+  if(it.hasSz){h+=`<div class="m-sec">Tamaño</div><div class="sz-btns">
+    <div class="sz-btn${curSz==='M'?' sel':''}" onclick="setSz('M')"><span class="sz-lbl">Mediana</span><span class="sz-p">$${it.priceM}</span></div>
+    <div class="sz-btn${curSz==='G'?' sel':''}" onclick="setSz('G')"><span class="sz-lbl">Grande</span><span class="sz-p">$${it.priceG}</span></div>
+    ${it.hasH?`<div class="sz-btn${curSz==='H'?' sel':''}" onclick="setSz('H')"><span class="sz-lbl">Hot ☕</span><span class="sz-p">$${it.priceH}</span></div>`:''}
+  </div>`;}
+  if(it.ing&&it.ing.length){h+=`<div class="m-sec">Ingredientes</div>`;h+=it.ing.map(ing=>{const rm=curRm.has(ing);return`<div class="ing-row${rm?' rm':''}" onclick="togIng('${ing}')"><div class="ing-n"><span class="dot"></span>${ing}</div><span style="font-size:16px;color:var(--dark-lt)">${rm?'＋':'－'}</span></div>`;}).join('');}
+  if(['toast','power'].includes(it.cat)){h+=`<div class="m-sec">Extras +$20</div>${modRows(EXTRAS)}<div class="m-sec">Aderezos +$15</div>${modRows(ADEREZOS)}<div class="m-sec">Papas</div>`;h+=PAPAS.map(m=>{const sel=curMods.has(m.id);return`<div class="mod-row${sel?' sel':''}" onclick="togPapa('${m.id}')"><div><div class="mod-n">${m.name}</div><div class="mod-p">+$${m.price}</div></div><div class="chk">${sel?'✓':''}</div></div>`;}).join('');}
+  if(['cafe','skinny','fresh'].includes(it.cat)){h+=`<div class="m-sec">Extras de Café</div>${modRows(CAFE_EX)}`;}
+  const sug=sugerencia_barista(it);
+  if(sug&&!orden.some(o=>o.id===sug.id)){h+=`<div class="m-sec">Sugerencia del Barista</div><div class="sug"><span style="font-size:20px">🧑‍🍳</span><div class="sug-txt">Marida perfecto con un <strong>${sug.name}</strong></div><button class="sug-btn" onclick="addSug('${sug.id}')">Agregar →</button></div>`;}
+  document.getElementById('m-body').innerHTML=h;updMTot();
+}
+function modRows(arr){return arr.map(m=>{const sel=curMods.has(m.id);return`<div class="mod-row${sel?' sel':''}" onclick="togMod('${m.id}')"><div><div class="mod-n">${m.name}</div><div class="mod-p">+$${m.price}</div></div><div class="chk">${sel?'✓':''}</div></div>`;}).join('');}
+function setSz(s){curSz=s;renderMBody();}
+function togIng(i){curRm.has(i)?curRm.delete(i):curRm.add(i);renderMBody();}
+function togMod(i){curMods.has(i)?curMods.delete(i):curMods.add(i);renderMBody();}
+function togPapa(i){const was=curMods.has(i);PAPAS.forEach(p=>curMods.delete(p.id));if(!was)curMods.add(i);renderMBody();}
+function getMods(){return[...curMods].map(id=>ALL_MODS.find(m=>m.id===id)).filter(Boolean);}
+function updMTot(){document.getElementById('m-tot-val').textContent='$'+(curP()+getMods().reduce((a,m)=>a+m.price,0));}
+function addSug(id){closeModal();setTimeout(()=>openModal(id),130);}
+function addToOrder(){
+  const mods=getMods(),szMap={M:'Med',G:'Gde',H:'Hot'};
+  const sizeLabel=curItem.hasSz?szMap[curSz]:null;
+  orden.push({...curItem,_price:curP(),sizeLabel,mods,removedIng:[...curRm],_oid:Date.now()});
+  closeModal();renderTicketPanel();
+  toast(`✓ ${curItem.name}${sizeLabel?' ('+sizeLabel+')':''} añadido`);
+}
+function closeModal(){document.getElementById('ov').classList.remove('open');}
+function bgClose(e){if(e.target===document.getElementById('ov'))closeModal();}
+
+function renderTicketPanel(){
+  const el=document.getElementById('tk-items');
+  const{total,cortesia}=calcular_total(orden);
+  if(!orden.length){el.innerHTML=`<div class="tk-empty"><span>🧡</span>Selecciona un producto<br>para empezar<br>tu orden</div>`;document.getElementById('tk-total').textContent='$0';document.getElementById('btn-ord').disabled=true;return;}
+  let h='';
+  orden.forEach((it,i)=>{
+    const itT=it._price+(it.mods||[]).reduce((a,m)=>a+m.price,0);
+    h+=`<div class="tk-item"><div class="tk-row"><div class="tk-name">${it.name}${it.sizeLabel?`<span class="tk-sz">${it.sizeLabel}</span>`:''}</div><div class="tk-p">$${itT}</div><button class="tk-rm-btn" onclick="rmItem(${i})">✕</button></div><div style="margin-top:2px;padding-left:2px">${(it.ing||[]).map(ing=>`<div class="tk-d${(it.removedIng||[]).includes(ing)?' rm':''}">· ${ing}</div>`).join('')}${(it.mods||[]).map(m=>`<div class="tk-d add">+ ${m.name} +$${m.price}</div>`).join('')}</div></div>`;
+  });
+  if(cortesia)h+=`<div class="cortesia"><span style="font-size:20px">🍪</span><div class="cortesia-txt"><strong>Cortesía Nochu</strong><br><span style="font-size:9px">Galleta Artesanal · Regalo de la casa</span></div></div>`;
+  el.innerHTML=h;
+  document.getElementById('tk-total').textContent='$'+total;
+  document.getElementById('btn-ord').disabled=false;
+}
+function rmItem(i){const n=orden[i].name;orden.splice(i,1);renderTicketPanel();toast(`✕ ${n} eliminado`);}
+
+function procesarOrden(){
+  const{total,cortesia}=calcular_total(orden);
+  const hash='NCH-'+Math.random().toString(36).substring(2,8).toUpperCase();
+  const now=new Date();
+  const hora=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const fecha=now.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+
+  document.getElementById('t-hash').textContent=hash;
+  document.getElementById('t-hora').textContent=`${fecha} · ${hora}`;
+  document.getElementById('t-total').textContent=`$${total} MXN`;
+  document.getElementById('t-cortesia').style.display=cortesia?'block':'none';
+
+  let iH='';
+  orden.forEach(it=>{
+    const sz=it.sizeLabel?` <span class="tki-sz">[${it.sizeLabel}]</span>`:'';
+    const itT=it._price+(it.mods||[]).reduce((a,m)=>a+m.price,0);
+    const ings=(it.ing||[]).filter(x=>!(it.removedIng||[]).includes(x));
+    const sins=it.removedIng||[];const exts=it.mods||[];
+    iH+=`<div class="tki"><div class="tki-top"><span class="tki-name">${it.name}${sz}</span><span class="tki-dots-fill"></span><span class="tki-price">$${itT}</span></div><div class="tki-detail">${ings.length?`<div>· ${ings.join(' · ')}</div>`:''} ${sins.map(s=>`<div class="sin">sin ${s}</div>`).join('')}${exts.map(e=>`<div class="ex">+ ${e.name} (+$${e.price})</div>`).join('')}</div></div>`;
+  });
+  document.getElementById('t-items').innerHTML=iH;
+
+  // ══ QR apunta al link de puntos Nochu ══
+  const loyaltyUrl='https://tr.ee/cvxKl14Ylc';
+  document.getElementById('t-qr').src=
+    `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=1C1007&bgcolor=FDF8F0&ecc=M&data=${encodeURIComponent(loyaltyUrl)}`;
+
+  document.getElementById('tk-ov').classList.add('open');
+}
+function newOrder(){orden=[];document.getElementById('tk-ov').classList.remove('open');renderTicketPanel();}
+
+function toast(msg){const c=document.getElementById('tc'),el=document.createElement('div');el.className='tn';el.textContent=msg;c.appendChild(el);setTimeout(()=>el.remove(),4100);}
+
+function tick(){const n=new Date(),hh=n.getHours().toString().padStart(2,'0'),mm=n.getMinutes().toString().padStart(2,'0');document.getElementById('clock').textContent=hh+':'+mm;document.getElementById('dbadge').style.display=es_horario_desayuno()?'block':'none';}
+
+renderTabs();renderMenu();tick();setInterval(tick,30000);
+</script>
+</body>
+</html>
