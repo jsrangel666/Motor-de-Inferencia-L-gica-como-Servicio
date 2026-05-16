@@ -22,6 +22,7 @@ El sistema permite a los clientes seleccionar productos del menú real, personal
 * `nochu-kiosk.html` : Interfaz táctil interactiva completa, lógica de control y Base de Conocimiento de Prolog integrada.
 * `Reporte_Proyecto_Nochu.pdf` : Documentque detalla la arquitectura y los fundamentos de los paradigmas aplicados.
 * `README.md` : Instrucciones de instalación, configuración y ejecución del entorno.
+* `NOCHU INSPO.pdf` : Documento donde expreso el proceso creativo del proyecto con la inspo.
 
 ---
 
