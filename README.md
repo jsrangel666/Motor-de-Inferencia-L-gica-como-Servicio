@@ -30,8 +30,13 @@ El sistema permite a los clientes seleccionar productos del menú real, personal
 
 Debido a la arquitectura desacoplada y al uso de **Tau Prolog** integrado nativamente en el entorno del cliente web, el proyecto no requiere de complejas instalaciones de servidores backend ni dependencias pesadas de Node.js. Se ejecuta directamente sobre cualquier navegador moderno.
 
+* Página web (UBICACIÓN, INSTAGRAM Y EL PROYECTO "nochu-kiosk.html": https://nochukiosko.framer.website/  
+* Proyecto:  https://jsrangel666.github.io/Motor-de-Inferencia-L-gica-como-Servicio/
+
 ### Pasos para ejecución local:
 
 1. **Clonar el repositorio** en tu máquina local:
    ```bash
-   git clone [https://github.com/TU_USUARIO/nochu-digital-kiosk.git](https://github.com/TU_USUARIO/nochu-digital-kiosk.git)
+   git clone [ https://jsrangel666.github.io/Motor-de-Inferencia-L-gica-como-Servicio/)
+
+   
